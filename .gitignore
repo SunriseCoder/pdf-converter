@@ -1,0 +1,27 @@
+# Eclipse
+.classpath
+.project
+.factorypath
+.settings
+.springBeans
+/.apt_generated/
+/.eclipse-pmd
+
+# Build
+target
+
+#Binaries
+files
+data
+
+# Logs
+log
+logs
+
+# Secret
+TODO
+src/main/resources/env/prod/
+src/main/resources/env/uat/
+
+# Generated
+src/main/resources/liquibase/diff.xml
