@@ -82,7 +82,7 @@ var replacementTables = [
 			// Semivowels
 			['य', 'ya'], ['र', 'ra'], ['ल', 'la'], ['व', 'va'],
 			// Sibilants
-			['ष', 'ṣa'], ['स', 'sa'],
+			['श', 's\u0341a'], ['ष', 'ṣa'], ['स', 'sa'],
 			// Aspirate
 			['ह', 'ha'],
 
@@ -91,7 +91,18 @@ var replacementTables = [
 
 			// Special
 			['्', '\u0008'], ['ँ', '' /* ??? (Chandra-Bindu) */], ['ं', 'ṇ'],
-			['।', ''], ['॥', '']
+			['ः', 'ḥ'],
+			['।', ''], ['|', ''], ['॥', ''],
+			['१', '1']
+		]
+	},{
+		comment: 'Gitabase.com russian diacritics',
+		doNotConvert: '[а-яӣӯ, \-]',
+		replacements: [
+			['', 'а̄'],
+			['', 'м̇'],
+			['', 'х̣'],
+			['', 'ш\u0341']
 		]
 	}
 ]
