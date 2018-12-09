@@ -1,0 +1,239 @@
+<html>
+    <head>
+		<meta charset="utf-8" />
+
+        <title>Broken fonts</title>
+
+		<style>
+			#diactriticTable td:nth-child(3) { text-align: center; }
+			#error {color: red;}
+			#resultText {color: black; font-family: Times New Roman;}
+		</style>
+		<script src="jquery-3.2.1.min.js"></script>
+		<script src="replacement-tables.js"></script>
+
+        <script>
+			function convertText() {
+				var select = document.getElementById('replacementSelect');
+				var selectedIndex = select.selectedIndex;
+				if (selectedIndex > replacementTables.length - 1) {
+					selectedIndex = 0;
+				}
+				var replacementTable = replacementTables[selectedIndex];
+				var doNotConvert = replacementTable.doNotConvert;
+				var replacements = replacementTable.replacements;
+				document.getElementById('error').innerText = '';
+				var sourceValue = document.getElementById('sourceText').value;
+				var resultValue = '';
+				for (var i = 0; i < sourceValue.length; i++) {
+                    var char = sourceValue.charAt(i);
+					var found = false;
+					if (char.match(doNotConvert)) {
+						resultValue += char;
+						found = true;
+					}
+					if (!found) {
+						for (var j = 0; j < replacements.length; j++) {
+							var repSrc = replacements[j][0];
+							var srcSubStr = sourceValue.substr(i, repSrc.length);
+							if (repSrc === srcSubStr) {
+								resultValue = addComplicatedChar(resultValue, replacements[j][1]);
+								//resultValue += replacements[j][1];
+								i += repSrc.length - 1;
+								found = true;
+								break;
+							}
+						}
+					}
+					if (!found) {
+						var errorLabel = document.getElementById('error');
+						errorLabel.innerText += 'Unknown symbol: ' + char + 
+								' (0x' + char.charCodeAt(0).toString(16) + '), pos: ' + i + '\n';
+						resultValue += '<font color="red">' + char + '</font>';
+					}
+				}
+				var resultInput = document.getElementById('resultText');
+				resultInput.innerHTML = resultValue;
+				
+				function addComplicatedChar(resultString, replacement) {
+					for (var i = 0; i < replacement.length; i++) {
+						var replacementChar = replacement[i];
+						if (replacementChar === '\u0008' && resultString.length > 0
+							&& resultString.charAt(resultString.length - 1) !== '>') {
+							resultString = resultString.substring(0, resultString.length - 1);
+							continue;
+						}
+						resultString += replacementChar;
+					}
+					return resultString;
+				}
+			}
+
+            function asciiToHexCodes(arg) {
+                var value = arg.value;
+                var table = document.getElementById('asciiToHexCodesTable');
+                table.innerHTML = '';
+
+                var data = [];
+                for (var i = 0; i < value.length; i++) {
+                    var char = value.charAt(i);
+                    var code = value.charCodeAt(i).toString(16);
+                    data.push({char: char, code: code});
+                }
+
+                table.appendChild(createRowFromArray(data, 'char'))
+                table.appendChild(createRowFromArray(data, 'code'))
+
+                function createRowFromArray(data, rowId) {
+                    var row = document.createElement('tr');
+                    for (var i = 0; i < data.length; i++) {
+                        var value = data[i][rowId];
+                        var cell = createCell(value);
+                        row.appendChild(cell);
+                    }
+                    return row;
+                }
+            }
+
+            function hexToAsciiCodes(arg) {
+                var value = arg.value;
+                var table = document.getElementById('hexToAsciiCodesTable');
+                table.innerHTML = '';
+
+                var data = [];
+				var charCodes = value.split(' ');
+                for (var i = 0; i < charCodes.length; i++) {
+					var hexCode = charCodes[i];
+					var decCode = parseInt(hexCode, 16);
+					var symbol = String.fromCharCode(decCode);
+                    data.push({char: symbol});
+                }
+
+                table.appendChild(createRowFromArray(data, 'char'))
+                //table.appendChild(createRowFromArray(data, 'code'))
+
+                function createRowFromArray(data, rowId) {
+                    var row = document.createElement('tr');
+					var value = '';
+                    for (var i = 0; i < data.length; i++) {
+                        value += data[i][rowId];
+                    }
+					var cell = createCell(value);
+					row.appendChild(cell);
+                    return row;
+                }
+            }
+
+            function createUnicodeTable() {
+                var table = document.getElementById('unicodeCharTable');
+
+                return; // Delete to build an unicode table
+
+                for (var i = 0; i < 256; i++) {
+                    table.appendChild(createHeaderRow());
+                    for (var j = 0; j < 16; j++) {
+                        var row = document.createElement('tr');
+                        var rowHexAddress = (i * 16 + j).toString(16).toUpperCase();
+                        row.appendChild(createCell(rowHexAddress));
+                        for (var k = 0; k < 16; k++) {
+                            var charCode = i * 256 + j * 16 + k;
+                            var value = String.fromCharCode(charCode);
+                            row.appendChild(createCell(value));
+                        }
+                    table.appendChild(row);
+                    }
+                }
+                
+                function createHeaderRow() {
+                    var row = document.createElement('tr');
+                    row.appendChild(createCell(''));
+                    for (var i = 0; i < 16; i++) {
+                        var value = i.toString(16).toUpperCase();
+                        row.appendChild(createCell(value));
+                    }
+                    return row;
+                }
+            }
+            
+            function createCell(value) {
+                var cell = document.createElement('td');
+                var cellValue = document.createTextNode(value);
+                cell.appendChild(cellValue);
+                return cell;
+            }
+
+			function reloadJs() {
+				var script = $('script[src=\'replacement-tables.js\']')[0];
+				document.head.removeChild(script);
+				script = document.createElement('script');
+				script.src = 'replacement-tables.js';
+				document.head.appendChild(script);
+				setTimeout(updateReplacementSelect, 100);
+				setTimeout(convertText, 200);
+			}
+
+			function updateReplacementSelect() {
+				var select = document.getElementById('replacementSelect');
+				var selectedIndex = select.selectedIndex;
+				while (select.hasChildNodes()) {
+					select.removeChild(select.lastChild);
+				}
+
+				var options = createOptions();
+				for (var i = 0; i < options.length; i++) {
+					var option = options[i];
+					select.appendChild(option);
+				}
+				if (selectedIndex != -1) {
+					select.selectedIndex = selectedIndex;
+				}
+				
+				function createOptions() {
+					var options = [];
+					for (var i = 0; i < replacementTables.length; i++) {
+						var repTable = replacementTables[i];
+						var option = document.createElement('option');
+						option.value = i;
+						var text = repTable.comment + '(' + repTable.replacements.length + ')';
+						option.innerText = text;
+						options.push(option);
+					}
+					return options;
+				}
+			}
+        </script>
+    </head>
+    <body onload="createUnicodeTable();updateReplacementSelect();">
+		<table id="diactriticTable">
+			<caption>Diacritic symbols</caption>
+			<thead><tr><th>Code</th><th>Name</th><th>Symbol</th><th>Comment</th></tr></thead>
+			<tbody>
+				<tr><td>012B</td><td>Latin small letter i with macron</td><td>&#x12b;</td><td>vah&#x12b; (single symbol)</td>
+				<tr><td>016B</td><td>Latin small letter u with macron</td><td>&#x16b;</td><td>dh&#x16b;ri (single symbol)</td>
+				<tr><td>0304</td><td>Combining Macron</td><td>&#x304;</td><td>Ma&#x304;ha (use after the symbol 'a')</td></tr>
+				<tr><td>0307</td><td>Combining Dot Above</td><td>&#x307;</td><td>vyudham&#x307; (use after the symbol 'm')</td></tr>
+				<tr><td>0323</td><td>Combining Dot Below</td><td>&#x323;</td><td>Caran&#x323;a (use after the symbol 'n')</td></tr>
+				<tr><td>0341</td><td>Combining Acute Tone Mark</td><td>&#x341;</td><td>Drupadas&#x341; (use after the symbol 's')</td></tr>
+				<tr><td>0342</td><td>Combining Greek Perispomeni</td><td>&#x342;</td><td>San&#x342;jaya (use after the symbol 'n')</td></tr>
+			</tbody>
+		</table>
+        <div>
+			Source: <button onclick="reloadJs();">Refresh</button>
+			<select id="replacementSelect" onchange="convertText();"></select>
+		</div>
+        <textarea id="sourceText" cols="100" rows="10" onkeyup="convertText()"></textarea>
+        <p>Result:</p>
+        <p id="resultText"></p>
+		<p id="error"></p>
+        
+        <p>ASCII to Hex-codes:</p>
+        <input id="asciiToHexCodesInput" type="text" size="100" onkeyup="asciiToHexCodes(this);" />
+        <table id="asciiToHexCodesTable" border="1"></table>
+
+		<p>Hex-codes to ASCII (separated by "space"):</p>
+		<input id="hexToAsciiCodesInput" type="text" size="100" onkeyup="hexToAsciiCodes(this);" />
+        <table id="hexToAsciiCodesTable" border="1"></table>
+
+        <table id="unicodeCharTable" border="1"></table>
+    </body>
+</html>
