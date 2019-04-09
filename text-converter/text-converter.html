@@ -9,15 +9,26 @@
 			#error {color: red;}
 
 			// Convert Text Progress Bar
-			#convertTextProgresss {  }
+			#convertTextProgress {  }
 			#convertTextBar { width: 0%; height: 30px; background-color: green; }
 
 			#resultText {color: black; font-family: Times New Roman;}
 		</style>
+
 		<script src="jquery-3.2.1.min.js"></script>
+
+		<script src="convert-utils.js"></script>
 		<script src="replacement-tables.js"></script>
 
         <script>
+			// Preventing overload of page on key-up events if text is big
+			function convertTextOnKeyUp() {
+				var sourceValue = document.getElementById('sourceText').value;
+				if (sourceValue.length < 300) {
+					convertText();
+				}
+			}
+
 			function convertText() {
 				var select = document.getElementById('replacementSelect');
 				var selectedIndex = select.selectedIndex;
@@ -25,61 +36,30 @@
 					selectedIndex = 0;
 				}
 				var replacementTable = replacementTables[selectedIndex];
-				var doNotConvert = replacementTable.doNotConvert;
-				var replacements = replacementTable.replacements;
+
 				document.getElementById('error').innerText = '';
+
 				var sourceValue = document.getElementById('sourceText').value;
-				var resultValue = '';
-				for (var i = 0; i < sourceValue.length; i++) {
-                    var char = sourceValue.charAt(i);
-					var found = false;
-					if (char.match(doNotConvert)) {
-						resultValue += char;
-						found = true;
-					}
-					if (!found) {
-						for (var j = 0; j < replacements.length; j++) {
-							var repSrc = replacements[j][0];
-							var srcSubStr = sourceValue.substr(i, repSrc.length);
-							if (repSrc === srcSubStr) {
-								resultValue = addComplicatedChar(resultValue, replacements[j][1]);
-								//resultValue += replacements[j][1];
-								i += repSrc.length - 1;
-								found = true;
-								break;
-							}
-						}
-					}
-					if (!found) {
-						var errorLabel = document.getElementById('error');
-						errorLabel.innerText += 'Unknown symbol: ' + char + 
-								' (0x' + char.charCodeAt(0).toString(16) + '), pos: ' + i + '\n';
-						resultValue += '<font color="red">' + char + '</font>';
-					}
-					console.log((i + 1) + ' of ' + sourceValue.length + ' is done');
-					updateProgressBar(i + 1, sourceValue.length);
-				}
-				var resultInput = document.getElementById('resultText');
-				resultInput.innerHTML = resultValue;
-				
-				function addComplicatedChar(resultString, replacement) {
-					for (var i = 0; i < replacement.length; i++) {
-						var replacementChar = replacement[i];
-						if (replacementChar === '\u0008' && resultString.length > 0
-							&& resultString.charAt(resultString.length - 1) !== '>') {
-							resultString = resultString.substring(0, resultString.length - 1);
-							continue;
-						}
-						resultString += replacementChar;
-					}
-					return resultString;
+
+				function error(char, i) {
+					var errorElement = document.getElementById('error');
+					errorElement.innerText += 'Unknown symbol: ' + char + 
+						' (0x' + char.charCodeAt(0).toString(16) + '), pos: ' + i + '\n';
 				}
 				
-				function updateProgressBar(value, total) {
-					var element = document.getElementById("convertTextBar"); 
-					var width = value / total * 100;
-					element.style.width = width + '%';
+				function result(resultValue) {
+					var resultElement = document.getElementById('resultText');
+					resultElement.innerHTML = resultValue;
 				}
+
+				function progress(value, total) {
+					var percentage = value / total * 100;
+					var progressElement = document.getElementById('convertTextBar');
+					progressElement.style.width = percentage + "%";
+					console.log(percentage + '%');
+				}
+
+				ConvertUtils.convertText(sourceValue, replacementTable, result, error, progress);
 			}
 
             function asciiToHexCodes(arg) {
@@ -233,10 +213,11 @@
         <div>
 			Source: <button onclick="reloadJs();">Refresh</button>
 			<select id="replacementSelect" onchange="convertText();"></select>
+			<button onclick="convertText();">Convert</button>
 		</div>
-        <textarea id="sourceText" cols="100" rows="10" onkeyup="convertText()"></textarea>
+        <textarea id="sourceText" cols="100" rows="10" onkeyup="convertTextOnKeyUp()"></textarea>
 
-		<div id="convertTextProgresss" style="width: 700px; background-color: #eee; border-style: groove;">
+		<div id="convertTextProgress" style="width: 700px; background-color: #eee; border-style: groove;">
 			<div id="convertTextBar">12%</div>
 		</div>
 

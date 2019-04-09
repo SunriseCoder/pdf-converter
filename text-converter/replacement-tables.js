@@ -1,6 +1,6 @@
 var replacementTables = [
 	{
-		comment: 'Bhagavad-Gita diacritics',
+		comment: 'Bhagavad-Gita Srila Narayana Maharaja Eng - Diacritics',
 		doNotConvert: '[а-я \\-\/’]', 
 		replacements: [
 			['\n', '<br />'],
@@ -8,7 +8,70 @@ var replacementTables = [
 			['u', 'н\u0342'], ['v', 'м\u0307'], ['b', 'и\u0304']
 		]
 	},{
-		comment: 'Bhagavad-Gita sanscrit',
+		comment: 'Bhagavad-Gita Srila Narayana Maharaja Eng - Sanscrit',
+		doNotConvert: '[ ]', 
+		replacements: [
+			// System
+			['\n', '<br />'], ['µ', '-'],
+
+			// 4 Chars
+				// R on top
+				[';ksZ', 'र्यो'],
+			
+			
+			// 2 Chars
+			// Ligaturs
+			['{k', 'क्ष'], ['fd', 'कि'],
+
+				// R on top
+				['eZ', 'र्म'],
+				[';Z', 'र्य'], ['oZ', 'र्व'],
+
+			['#', 'रु'],
+			// Letters
+			['/k', 'ध'],
+			['cz', 'ब्र'],
+			['vk', 'आ'], ['ks', 'ो'],
+
+			// 1 Char
+			// Ligaturs
+			['Â', 'ङ्ग'],
+			['=', 'त्र'],
+
+			// Letters
+			['d', 'क'],
+			['p', 'च'], ['t', 'ज'],
+			['M', 'ड'], ['<', 'ढ'], ['.', 'ण्'],
+			['r', 'त'], ['n', 'द'], ['u', 'न'],
+			['i', 'प'], ['j', 'र'], ['e', 'म'],
+			[';', 'य'], ['o', 'व'], ['l', 'स'],
+
+			['m', 'उ'],
+			['k', 'ा'], ['h', 'ी'], ['q', 'ु'], ['w', 'ू'],
+			['`', 'ृ'],
+			['s', 'े'], ['S', 'ै'],
+			['a', 'ं'], ['%', 'ः'],
+			['A', '।'], ['û', '॥'],
+			['ƒ', '१'], ['„', '२'],
+			['~', '्'],
+
+			// Parts
+			['´', 'ञ्'],
+			['V', 'ट्'],
+			['R', 'त्'],
+			['E', 'म्'],
+			['ª', 'र'], ['O', 'व्'], ['\'', 'श्'], ['"', 'ष्'], ['L', 'स्']
+		]
+	},{
+		comment: 'Bhagavad-Gita Srila Narayana Maharaja Rus - Diacritics',
+		doNotConvert: '[а-я \\-\/’]', 
+		replacements: [
+			['\n', '<br />'],
+			['h', 'р\u0323'], ['f', 'а\u0304'], ['n', 'т\u0323'], ['x', 'х\u0323'], ['t', 'н\u0323'], ['l', 'д\u0323'], ['i', 'ш\u0341'],
+			['u', 'н\u0342'], ['v', 'м\u0307'], ['b', 'и\u0304']
+		]
+	},{
+		comment: 'Bhagavad-Gita Srila Narayana Maharaja Rus - Sanscrit',
 		doNotConvert: '[ ]', 
 		replacements: [
 			// System
@@ -96,7 +159,7 @@ var replacementTables = [
 			['१', '1']
 		]
 	},{
-		comment: 'Gitabase.com russian diacritics',
+		comment: 'Gitabase.com - Russian diacritics fix',
 		doNotConvert: '[0-9А-Яа-яӣӯ,;:. \-\(\)]',
 		replacements: [
 			// System
