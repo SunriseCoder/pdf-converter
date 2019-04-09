@@ -97,10 +97,16 @@ var replacementTables = [
 		]
 	},{
 		comment: 'Gitabase.com russian diacritics',
-		doNotConvert: '[а-яӣӯ, \-]',
+		doNotConvert: '[0-9А-Яа-яӣӯ,;:. \-\(\)]',
 		replacements: [
+			// System
+			['\n', '<br />'], ['-', ''], ['—', '-'],
+			
+			// Russian chars with diacritics
 			['', 'а̄'],
 			['', 'м̇'],
+			['', 'н̣'],
+			['', 'р̣'],
 			['', 'х̣'],
 			['', 'ш\u0341']
 		]

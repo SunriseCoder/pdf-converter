@@ -7,6 +7,11 @@
 		<style>
 			#diactriticTable td:nth-child(3) { text-align: center; }
 			#error {color: red;}
+
+			// Convert Text Progress Bar
+			#convertTextProgresss {  }
+			#convertTextBar { width: 0%; height: 30px; background-color: green; }
+
 			#resultText {color: black; font-family: Times New Roman;}
 		</style>
 		<script src="jquery-3.2.1.min.js"></script>
@@ -51,6 +56,8 @@
 								' (0x' + char.charCodeAt(0).toString(16) + '), pos: ' + i + '\n';
 						resultValue += '<font color="red">' + char + '</font>';
 					}
+					console.log((i + 1) + ' of ' + sourceValue.length + ' is done');
+					updateProgressBar(i + 1, sourceValue.length);
 				}
 				var resultInput = document.getElementById('resultText');
 				resultInput.innerHTML = resultValue;
@@ -66,6 +73,12 @@
 						resultString += replacementChar;
 					}
 					return resultString;
+				}
+				
+				function updateProgressBar(value, total) {
+					var element = document.getElementById("convertTextBar"); 
+					var width = value / total * 100;
+					element.style.width = width + '%';
 				}
 			}
 
@@ -222,6 +235,11 @@
 			<select id="replacementSelect" onchange="convertText();"></select>
 		</div>
         <textarea id="sourceText" cols="100" rows="10" onkeyup="convertText()"></textarea>
+
+		<div id="convertTextProgresss" style="width: 700px; background-color: #eee; border-style: groove;">
+			<div id="convertTextBar">12%</div>
+		</div>
+
         <p>Result:</p>
         <p id="resultText"></p>
 		<p id="error"></p>
